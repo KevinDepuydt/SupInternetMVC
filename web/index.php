@@ -1,43 +1,42 @@
 <?php
+/**
+* This is you FrontController, the only point of access to your webapp
+*/
+use Symfony\Component\Yaml\Yaml;
+
+require __DIR__ . '/../vendor/autoload.php';
 
 /**
- * This is you FrontController, the only point of access to your webapp
- */
- 
- require __DIR__ . '/../vendor/autoload.php';
- 
+* Use Yaml components for load a config routing, $routes is in yaml app/config/routing.yml :
+*
+* Url will be /index.php?p=route_name
+*/
 
-/**
- * Use Yaml components for load a config routing, $routes is in yaml app/config/routing.yml :
- *
- * Url will be /index.php?p=route_name
- *
- *
- */
-$routes = ...
+$routes = Yaml::parse(file_get_contents(__DIR__.'/../app/config/routing.yml'));
 
-//Thaks to p=, find the current route
-$current_route = ...
+if(isset($_GET['p'])){
 
-//ControllerClassName, end name is ...Controller
-$controller_class = ... ;
+	$currentroute = $routes[$_GET['p']]['controller'];
+	$routes_array = explode(':',$currentroute);
 
-//ActionName, end name is ...Action
-$action_name = ...;
+	//ControllerClassName, end name is ...Controller
+	$controller_class = $routes_array[0];
 
-$controller = new $controller_class();
+	//ActionName, end name is ...Action
+	$action_name = $routes_array[1];
+	$controller = new $controller_class();
 
-//$Request can by an object
-$request['request'] = &$_POST;
-$request['query'] = &$_GET;
-$request['session'] = &$_SESSION;
-//...
+	//$Request can by an object
+	$request['request'] = &$_POST;
+	$request['query'] = &$_GET;
+    $request['session'] = &$_SESSION;
 
-//$response can be an object
-$response = $controller->$action_name($request);
+	//...
+	//$response can be an object
+	$response = $controller->$action_name($request);
 
-
-/**
- * Use Twig !
- */
-require $response['view'];
+	/**
+	* Use Twig !
+	*/
+	require $response['view'];
+}
