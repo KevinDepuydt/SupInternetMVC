@@ -1,0 +1,6 @@
+doctrine:
+  host: localhost
+  dbname: website
+  user: root
+  password:
+  driver: pdo_mysql
