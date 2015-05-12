@@ -1,6 +1,6 @@
 doctrine:
   host: localhost
-  dbname: website
+  dbname: twitter
   user: root
   password:
   driver: pdo_mysql

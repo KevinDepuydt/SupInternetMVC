@@ -10,6 +10,8 @@ require __DIR__ . '/../vendor/autoload.php';
 * Use Yaml components for load a config routing, $routes is in yaml app/config/routing.yml :
 *
 * Url will be /index.php?p=route_name
+*
+*
 */
 
 $routes = Yaml::parse(file_get_contents(__DIR__.'/../app/config/routing.yml'));
@@ -35,8 +37,17 @@ if(isset($_GET['p'])){
 	//$response can be an object
 	$response = $controller->$action_name($request);
 
+    /** do a redirection here if $response['redirect_to'] exists **/
+    // test de l'existence d'une redirection
+    if (isset($request['redirect_to'])) {
+        // header de redirection
+        header('Location: '.$request['redirect_to']);
+        exit;
+    }
+
 	/**
 	* Use Twig !
 	*/
+
 	require $response['view'];
 }

@@ -25,16 +25,14 @@ class UserController {
     public function listUserAction($request) {
         //Use Doctrine DBAL here
 
-        /*****/
         $config = new \Doctrine\DBAL\Configuration();
-
 
         //for this array use config_dev.yml and YamlComponents
         // http://symfony.com/fr/doc/current/components/yaml/introduction.html
         $connectionParams = array(
-            'dbname' => 'mydb',
-            'user' => 'user',
-            'password' => 'secret',
+            'dbname' => 'twitter',
+            'user' => 'root',
+            'password' => '',
             'host' => 'localhost',
             'driver' => 'pdo_mysql',
         );
@@ -43,16 +41,13 @@ class UserController {
 
         // http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/data-retrieval-and-manipulation.html
         // it's much better if you use QueryBuilder : http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/query-builder.html
-        $statement = $conn->prepare('SELECT * FROM user');
-
-
+        $statement = $conn->prepare('SELECT * FROM users');
         $statement->execute();
         $users = $statement->fetchAll();
-/******/     
 
         //you can return a Response object
         return [
-            'view' => 'WebSite/View/user/listUser.html.php', // should be Twig : 'WebSite/View/user/listUser.html.twig'
+            'view' => '../src/WebSite/View/user/listUser.html.php', // should be Twig : 'WebSite/View/user/listUser.html.twig'
             'users' => $users
         ];
     }
@@ -66,7 +61,16 @@ class UserController {
     public function showUserAction($request) {
         //Use Doctrine DBAL here
 
-        $user = ...
+        $user = new \Doctrine\DBAL\Configuration();
+
+        $connectionParams = array(
+            'dbname' => 'twitter',
+            'user' => 'root',
+            'password' => '',
+            'host' => 'localhost',
+            'driver' => 'pdo_mysql',
+        );
+        $conn = \Doctrine\DBAL\DriverManager::getConnection($connectionParams, $config);
 
         //you can return a Response object
         return [
@@ -85,11 +89,16 @@ class UserController {
         if ($request['request']) { //if POST
             //handle form with DBAL
             //...
+            $req = $this->bdd->prepare('INSERT INTO users (name, password) VALUES (:name, :password)');
+            $req->execute([
+                'name' => $request['request']['name'],
+                'password' => sha1($request['request']['password'])
+            ]);
 
             //Redirect to show
             //you should return a RedirectResponse object
             return [
-                'redirect_to' => 'http://.......',// => manage it in index.php !! URL should be generate by Routing functions thanks to routing config
+                'redirect_to' => 'index.php?p=user_list',// => manage it in index.php !! URL should be generate by Routing functions thanks to routing config
 
             ];
         }
@@ -98,7 +107,7 @@ class UserController {
         //you should return a Response object
         return [
             'view' => 'WebSite/View/user/addUser.html.php',// => create the file
-            'user' => $user
+            // 'user' => $user
         ];
     }
 
@@ -113,7 +122,7 @@ class UserController {
 
         //you should return a RedirectResponse object , redirect to list
         return [
-            'redirect_to' => 'http://.......',// => manage it in index.php !! URL should be generate by Routing functions thanks to routing config
+            'redirect_to' => 'index.php?p=user_list',// => manage it in index.php !! URL should be generate by Routing functions thanks to routing config
 
         ];
     }
@@ -130,7 +139,7 @@ class UserController {
         }
 
 
-        //take FlashBag system from
+        // take FlashBag system from
         // https://github.com/NicolasBadey/SupInternetTweeter/blob/master/model/functions.php
         // line 87 : https://github.com/NicolasBadey/SupInternetTweeter/blob/master/index.php
         // and manage error and success
